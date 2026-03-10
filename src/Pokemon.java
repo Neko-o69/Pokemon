@@ -19,8 +19,11 @@ public class Pokemon {
         }
     }
 
-    public void getAttaqueByIndex(int index){
-        this.attaque = attaque;
+    public Attaque getAttaqueByIndex(int index){
+        if(index > NB_ATTAQUES){
+            return null;
+        }
+        return this.attaques[index];
     }
     
     public attaquer(Attaque[], ){}
