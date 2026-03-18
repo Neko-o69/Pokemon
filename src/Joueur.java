@@ -1,23 +1,20 @@
-public class Joueur {
-    private String nom; 
+abstract class Joueur {
+    protected String nom;
     private static final int NB_POKEMON = 6;
-    private int nbPokemonsActifs = this.NB_POKEMON;
-    private Pokemon [] equipePokemon;
+    private int nbPokemonsActifs = NB_POKEMON;
+    private Pokemon[] equipePokemon;
 
-
-    public Joueur(String nom){
+    public Joueur(String nom) {
         this.nom = nom;
-        equipePokemon = new Pokemon [this.NB_POKEMON];
+        this.equipePokemon = new Pokemon[NB_POKEMON];
     }
 
-
-    public Joueur(String nom, Pokemon p[]){
-        super(nom);
-        for(int i =0; i<this.NB_POKEMON;i++){
+    public Joueur(String nom, Pokemon[] p) {
+        this(nom); 
+        for (int i = 0; i < NB_POKEMON; i++) {
             this.equipePokemon[i] = p[i];
-        }
-    }
+        }   
 
-    
+    }   
+
 }
-

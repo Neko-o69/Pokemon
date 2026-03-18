@@ -1,7 +1,7 @@
-private class Type{
+class Type {
     public String nom;
-
-    public Type
-
-
+ 
+    public Type(String nom) {
+        this.nom = nom;
+    }
 }
