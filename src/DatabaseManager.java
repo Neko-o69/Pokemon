@@ -8,9 +8,9 @@ import java.sql.SQLException;
  */
 public class DatabaseManager {
 
-    private static final String URL = "jdbc:mysql://localhost/pokemon"; //A modifier
-    private static final String USER = "toto"; // A modifier
-    private static final String PASSWORD = "******"; // A modifier
+    private static final String URL = "jdbc:mariadb://localhost/pokemon";
+    private static final String USER = "othmane"; // A modifier
+    private static final String PASSWORD = "linux"; // A modifier
 
     private Connection connection;
 

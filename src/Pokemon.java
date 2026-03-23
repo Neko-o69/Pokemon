@@ -15,7 +15,7 @@ public class Pokemon {
         this.nom = nom;
         this.attaques = new Attaque[NB_ATTAQUES];
         for(int i=0; i<this.NB_ATTAQUES;i++){
-            this.attaques[i] = new Attaque(); //A compléter 
+            this.attaques[i] = new Attaque(i, i, nom, type1, i); 
         }
     }
 
@@ -26,7 +26,7 @@ public class Pokemon {
         return this.attaques[index];
     }
     
-    public attaquer(Attaque[], ){}
+    public void attaquer(Attaque[] attaques){}
 
     public int getPvMax(){
         return this.pvMax;

@@ -3,8 +3,8 @@ class JoueurHumain extends Joueur {
     public boolean[] badges = new boolean[8];
     public int nbVictoire = 0;
  
-    public JoueurHumain() {
-        super();
+    public JoueurHumain(String nom) {
+        super(nom);
     }
 }
  

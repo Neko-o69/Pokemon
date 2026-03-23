@@ -3,7 +3,7 @@ class JoueurIA extends Joueur {
     public String nomArene;
     public String nomVille;
  
-    public JoueurIA() {
-        super();
+    public JoueurIA(String nom) {
+        super(nom);
     }
 }
