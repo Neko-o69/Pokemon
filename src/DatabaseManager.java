@@ -4,22 +4,27 @@ import java.sql.SQLException;
 
 /**
  * Classe responsable de la connexion à la base de données.
- * Centralise l'ouverture et la fermeture de connexion.
  */
 public class DatabaseManager {
 
-    private static final String URL = "jdbc:mysql://localhost/pokemon"; //A modifier
-    private static final String USER = "toto"; // A modifier
-    private static final String PASSWORD = "******"; // A modifier
+    private static final String URL = "jdbc:mysql://localhost:3306/pokemon?useSSL=false&serverTimezone=UTC";
+    private static final String USER = "root"; // adapte si besoin
+    private static final String PASSWORD = ""; // adapte si besoin
 
     private Connection connection;
 
     /**
      * Ouvre la connexion à la base.
      */
-    public void connect() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+    public void connect() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                System.out.println("✅ Connexion à la base réussie !");
+            }
+        } catch (SQLException e) {
+            System.out.println("❌ Erreur de connexion à la base !");
+            e.printStackTrace();
         }
     }
 
@@ -33,9 +38,14 @@ public class DatabaseManager {
     /**
      * Ferme la connexion.
      */
-    public void disconnect() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
+    public void disconnect() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+                System.out.println("🔌 Connexion fermée.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
