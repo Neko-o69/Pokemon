@@ -14,13 +14,13 @@ public class Pokemon {
     public Pokemon(String nom){
         this.nom = nom;
         this.attaques = new Attaque[NB_ATTAQUES];
-        for(int i=0; i<this.NB_ATTAQUES;i++){
+        for(int i=0; i<NB_ATTAQUES;i++){
             this.attaques[i] = new Attaque(i, i, nom, type1, i); 
         }
     }
 
     public Attaque getAttaqueByIndex(int index){
-        if(index > NB_ATTAQUES){
+        if(index >= NB_ATTAQUES){
             return null;
         }
         return this.attaques[index];

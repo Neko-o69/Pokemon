@@ -18,5 +18,16 @@ public class Test {
         } catch (SQLException e) {
             System.out.println("Erreur : " + e.getMessage());
         }
+
+
+        /**
+         * Test Classe partie
+         */
+
+        Partie maPartie = new Partie();
+        System.out.println(maPartie);
+        
+
+
     }
 }
