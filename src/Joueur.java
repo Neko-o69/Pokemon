@@ -18,6 +18,24 @@ abstract class Joueur {
     }   
     public int getNbPokemonsActifs(){
         return this.nbPokemonsActifs;
+    }
+    public String getNom(){
+        return this.nom;
+    }
+    public Pokemon[] getEquipePokemon() {
+        return this.equipePokemon;
+    }
 
+    public void setPokemon(int index, Pokemon p) {
+        if (index >= 0 && index < NB_POKEMON) {
+            this.equipePokemon[index] = p;
+        }
+    }
+
+    public Pokemon getPokemon(int index) {
+        if (index >= 0 && index < NB_POKEMON) {
+            return this.equipePokemon[index];
+        }
+        return null;
     }
 }

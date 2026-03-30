@@ -35,7 +35,36 @@ public class Pokemon {
         return this.pvMax;
     }
 
+    public String getNom() {
+        return this.nom;
+    }
+
     public void setPvMax(int pvMax) {
         this.pvMax = pvMax;
+    }
+
+
+    public void setPv(int pv) {
+        this.pv = pv;
+    }
+
+    public void setAttaque(int attaque) {
+        this.attaque = attaque;
+    }
+    
+    public void setDefense(int defense) {
+        this.defense = defense;
+    }
+    
+    public void setVitesse(int vitesse) {
+        this.vitesse = vitesse;
+    }
+
+    public void setType1(Type type1) {
+        this.type1 = type1;
+    }
+    
+    public void setType2(Type type2) {
+        this.type2 = type2;
     }
 }
