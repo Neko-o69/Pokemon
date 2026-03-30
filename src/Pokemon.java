@@ -10,31 +10,32 @@ public class Pokemon {
     private Type type2;
     private Attaque[] attaques;
 
-
-    public Pokemon(String nom){
+    public Pokemon(String nom) {
         this.nom = nom;
         this.attaques = new Attaque[NB_ATTAQUES];
-        for(int i=0; i<NB_ATTAQUES;i++){
-            this.attaques[i] = new Attaque(i, i, nom, type1, i); 
-        }
     }
 
-    public Attaque getAttaqueByIndex(int index){
-        if(index >= NB_ATTAQUES){
+    public Attaque getAttaqueByIndex(int index) {
+        if (index < 0 || index >= NB_ATTAQUES) {
             return null;
         }
         return this.attaques[index];
     }
-    
-    public void attaquer(Attaque[] attaques){}
 
-    public int getPvMax(){
+    public int attaquer(Attaque attaque, Pokemon adversaire) {
+        if (attaque == null || adversaire == null) {
+            return 0;
+        }
+
+        int degats = 10;
+        return degats;
+    }
+
+    public int getPvMax() {
         return this.pvMax;
     }
 
-    public void setPvMax(int pvMax){
+    public void setPvMax(int pvMax) {
         this.pvMax = pvMax;
-        
     }
-
 }

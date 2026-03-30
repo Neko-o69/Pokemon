@@ -1,8 +1,12 @@
-class Etat {
-    public String nom;
-    public int nbTour = 0;
- 
-    public Etat() {}
- 
-    public void effet() {}
+public class Etat {
+    private String nom;
+    private int nbTour = 0;
+
+    public Etat(String nom) {
+        this.nom = nom;
+    }
+
+    public void effet() {
+        System.out.println("Etat : " + nom);
+    }
 }

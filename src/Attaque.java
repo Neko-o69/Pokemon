@@ -15,9 +15,20 @@ public class Attaque {
         this.priorite = priorite;
 
     }
-
-    
-
-
-    
+    public int getPuissance() { 
+        return puissance; 
+    }
+    public String getNom() { 
+        return nom; 
+    }
+    public int getPrecision() {
+         return precision; 
+        }
+    public Type getType() { 
+        return type; 
+    }
+    public int getPriorite() { 
+        return priorite;
+    }
 }
+    

@@ -1,6 +1,6 @@
 abstract class Joueur {
     protected String nom;
-    private static final int NB_POKEMON = 6;
+    public static final int NB_POKEMON = 6;
     private int nbPokemonsActifs = NB_POKEMON;
     private Pokemon[] equipePokemon;
 
@@ -16,5 +16,8 @@ abstract class Joueur {
         }   
 
     }   
+    public int getNbPokemonsActifs(){
+        return this.nbPokemonsActifs;
 
+    }
 }
