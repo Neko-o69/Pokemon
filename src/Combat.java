@@ -16,21 +16,7 @@ class Combat {
         }
 
     }
- 
-    private Joueur victoire() {
-        if (joueur1.getNbPokemonsActifs() ==0){
-            return joueur2;
-        } 
-        return joueur1; 
-    }
-
-    public  Boolean finPartie(){
-        if(joueur1.getNbPokemonsActifs() == 0 || joueur2.getNbPokemonsActifs() ==0){
-            System.out.println("Le gagnant est :" + this.victoire().getNom());
-            return true;
-        }
-    }
-
+    
     public Boolean demarrerCombat() {
         pokemon1 = joueur1.getEquipePokemon()[0];
         pokemon2 = joueur2.getEquipePokemon()[0];
@@ -43,9 +29,24 @@ class Combat {
 
         System.out.println(joueur1.getNom() + " choisi " + pokemon1.getNom());
         System.out.println(joueur2.getNom() + " choisi " + pokemon2.getNom());
-
-        combat = new Combat(joueur1, joueur2);
         return true;
+    }
+
+
+
+    private Joueur victoire() {
+        if (joueur1.getNbPokemonsActifs() ==0){
+            return joueur2;
+        } 
+        return joueur1; 
+    }
+
+    public  Boolean finPartie(){
+        if(joueur1.getNbPokemonsActifs() == 0 || joueur2.getNbPokemonsActifs() ==0){
+            System.out.println("Le gagnant est :" + this.victoire().getNom());
+            return true;
+        }
+        return false;
     }
 
  
