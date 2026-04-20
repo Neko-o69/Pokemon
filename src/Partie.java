@@ -32,13 +32,5 @@ public class Partie {
         int degats2 = pokemon2.attaquer(attaque2, pokemon1);
         System.out.println(pokemon2.getNom() + " attaque");
     
-        if (degats1 > degats2) {
-            System.out.println("Le gagnant est " + joueur1.getNom());
-        } else if (degats2 > degats1) {
-            System.out.println("Le gagnant est " + joueur2.getNom());
-        } else {
-            System.out.println("Match nul");
-        }
-    }
-          
+}
 }

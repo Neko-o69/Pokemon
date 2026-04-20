@@ -16,7 +16,7 @@ class Combat {
         }
 
     }
-    
+
     public Boolean demarrerCombat() {
         pokemon1 = joueur1.getEquipePokemon()[0];
         pokemon2 = joueur2.getEquipePokemon()[0];
@@ -47,6 +47,14 @@ class Combat {
             return true;
         }
         return false;
+    }
+
+    if (degats1 > degats2) {
+        System.out.println("Le gagnant est " + joueur1.getNom());
+    } else if (degats2 > degats1) {
+        System.out.println("Le gagnant est " + joueur2.getNom());
+    } else {
+        System.out.println("Match nul");
     }
 
  
