@@ -27,8 +27,17 @@ public class Pokemon {
             return 0;
         }
 
-        int degats = 10;
+        int degats = this.attaque;
+        int nouveauxPv = adversaire.getPv() - degats;
+            if (nouveauxPv < 0) {
+            nouveauxPv = 0;
+        }
+        adversaire.setPv(nouveauxPv);
         return degats;
+    }
+
+    public int getPv() {
+        return this.pv;
     }
 
     public int getPvMax() {

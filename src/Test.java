@@ -20,14 +20,30 @@ public class Test {
         }
 
 
-        /**
-         * Test Classe partie
-         */
+        JoueurHumain joueur1 = new JoueurHumain("Othmane");
+        JoueurHumain joueur2 = new JoueurHumain("Jessim");
 
-        Partie maPartie = new Partie();
-        System.out.println(maPartie);
         
+        Pokemon pikachu = new Pokemon("Pikachu");
+        Pokemon salameche = new Pokemon("Salameche");
 
+        
+        pikachu.setPvMax(100);
+        pikachu.setPv(100);
+        pikachu.setAttaque(20);
 
+        salameche.setPvMax(100);
+        salameche.setPv(100);
+        salameche.setAttaque(18);
+
+        
+        joueur1.setPokemon(0, pikachu);
+        joueur2.setPokemon(0, salameche);
+
+       
+        Partie partie = new Partie(joueur1, joueur2);
+        partie.jouerPartie();
     }
+
+
 }

@@ -10,6 +10,9 @@ public class Partie {
         this.joueur2 = joueur2;
         this.combat = new Combat(joueur1, joueur2);
     }
+    private void bouclePrincipale() {
+        this.combat.lancerCombat();
+    }
 
     public void jouerPartie(){
         Boolean combatBool;
@@ -21,16 +24,4 @@ public class Partie {
         this.bouclePrincipale();    
     }
         
-    private void bouclePrincipale() {
-
-        Attaque attaque1 = pokemon1.getAttaqueByIndex(0);
-        Attaque attaque2 = pokemon2.getAttaqueByIndex(0);
-    
-        int degats1 = pokemon1.attaquer(attaque1, pokemon2);
-        System.out.println(pokemon1.getNom() + " attaque");
-    
-        int degats2 = pokemon2.attaquer(attaque2, pokemon1);
-        System.out.println(pokemon2.getNom() + " attaque");
-    
-}
 }
