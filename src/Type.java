@@ -1,5 +1,6 @@
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Type {
     private String nom;
@@ -26,12 +27,22 @@ public class Type {
 
     public double recupMulti(int fkAtt,int fkDef){
     String sql = "SELECT multi from efficacite WHERE fkAtt = ? and fkDef= ? LIMIT 1;";
-
-    PreparedStatement pstmt = dbm.prepareStatement(sql);
+    DatabaseManager dbm = new DatabaseManager();
+    try {
+        dbm.connect();
+        System.out.println("Connexion réussie !");
+    PreparedStatement pstmt = dbm.getConnection().prepareStatement(sql);
     pstmt.setInt(1,fkAtt);
     pstmt.setInt(2,fkDef);
-    ResultSet multi = pstmt.executeQuery(sql);
-    return multi ;
+    ResultSet multi = pstmt.executeQuery(sql);  
+
+
+    return 1 ;
+            } catch (SQLException e) {
+            System.out.println("Erreur : " + e.getMessage());
+        }
+
+  return 2;
 }
 
 }
