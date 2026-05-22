@@ -70,8 +70,31 @@ public class Attaque {
         <li><a href="javascript:closeDialog('mainContent_mpeMailsModif');">Fermer</a></li>
     </ul>
 </asp:Panel>
+protected void Page_Load(object sender, EventArgs e)
+{
+    String strPath = "C:\\Users\\Azizi OTHMANE\\Documents\\Visual Studio 2022\\Projects\\Quality\\Images\\Quality";
+    String strConnection = ConfigurationManager.ConnectionStrings["OPHELIE"].ConnectionString;
+    
+    RestoreFolder(strPath, "", strConnection);
+}
 
-
+private void RestoreFolder(string physicalPath, string parentPath, string strConnection)
+{
+    DirectoryInfo dir = new DirectoryInfo(physicalPath);
+    
+    foreach (DirectoryInfo subDir in dir.GetDirectories())
+    {
+        string fullPath = parentPath == "" ? subDir.Name : parentPath + "/" + subDir.Name;
+        
+        string strSQL = "IF NOT EXISTS (SELECT 1 FROM BASE_DOCUMENTAIRES WHERE BD_FULL_PATH = '" + fullPath + "') " +
+                       "INSERT INTO BASE_DOCUMENTAIRES (BD_FULL_PATH, BD_NAME, BD_FOLDER_PARENT, BD_TYPE) " +
+                       "VALUES ('" + fullPath + "', '" + subDir.Name + "', '" + parentPath + "', 0)";
+        
+        DBHelper.SQLExecute(strSQL, strConnection);
+        
+        RestoreFolder(subDir.FullName, fullPath, strConnection);
+    }
+}
 if (tbFolderName) tbFolderName.value = tbFolderName.value.replace(/'/g, "\'");
 if (tb) strDisplay = strDisplay.replace(/'/g, "\'");
 if (tb) strDescription = strDescription.replace(/'/g, "&quote");
