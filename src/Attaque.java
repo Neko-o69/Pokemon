@@ -102,9 +102,28 @@ if (tb) strDescription = strDescription.replace(/'/g, "&quote");
 
 
 
+private void RestoreDB()
+{
+    String strPath = ConfigurationManager.AppSettings["PATH"];
+    String strConnection = ConfigurationManager.ConnectionStrings["OPHELIE"].ConnectionString;
+    RestoreFolder(strPath + "Quality", "", strConnection);
+}
 
+private void RestoreFolder(string physicalPath, string parentPath, string strConnection)
+{
+    DirectoryInfo dir = new DirectoryInfo(physicalPath);
+    foreach (DirectoryInfo subDir in dir.GetDirectories())
+    {
+        string fullPath = parentPath == "" ? subDir.Name : parentPath + "/" + subDir.Name;
+        string strSQL = "IF NOT EXISTS (SELECT 1 FROM BASE_DOCUMENTAIRES WHERE BD_FULL_PATH = '" + fullPath + "') " +
+                       "INSERT INTO BASE_DOCUMENTAIRES (BD_FULL_PATH, BD_NAME, BD_FOLDER_PARENT, BD_TYPE) " +
+                       "VALUES ('" + fullPath + "', '" + subDir.Name + "', '" + parentPath + "', 0)";
+        DBHelper.SQLExecute(strSQL, strConnection);
+        RestoreFolder(subDir.FullName, fullPath, strConnection);
+    }
+}
 
-
+RestoreDB();
                         
 
 <%-- Extender pour les mails de modification --%>
