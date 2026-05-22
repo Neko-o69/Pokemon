@@ -71,6 +71,19 @@ public class Attaque {
     </ul>
 </asp:Panel>
 
+
+if (tbFolderName) tbFolderName.value = tbFolderName.value.replace(/'/g, "\'");
+if (tb) strDisplay = strDisplay.replace(/'/g, "\'");
+if (tb) strDescription = strDescription.replace(/'/g, "&quote");
+
+
+
+
+
+
+
+                        
+
 <%-- Extender pour les mails de modification --%>
 <asp:HiddenField ID="hfMailsModif" runat="server" />
 <ajaxToolkit:ModalPopupExtender ID="mpeMailsModif" runat="server"
