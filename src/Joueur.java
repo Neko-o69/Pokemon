@@ -1,17 +1,30 @@
-if (Request.Files.Count > 0)
-{
-    HttpPostedFile file = Request.Files[0];
+var selectedFiles;
 
-    String strParentFolder = "Quality";
+var box = document.getElementById("dropZone");
 
-    String strFullPath =
-        strParentFolder + "/" + file.FileName.Replace("'", "&quote");
+box.addEventListener("dragover", function (e) {
+    e.preventDefault();
+});
 
-    String strFileName =
-        Server.MapPath("Images/") + strFullPath;
+box.addEventListener("drop", function (e) {
+    e.preventDefault();
+    selectedFiles = e.dataTransfer.files;
+});
 
-    file.SaveAs(strFileName);
+document.getElementById("upload").onclick = function () {
 
-    Response.Write("OK");
-    Response.End();
-}
+    var data = new FormData();
+
+    data.append("file", selectedFiles[0]);
+
+    $.ajax({
+        type: "POST",
+        url: "QualityFolder.aspx",
+        data: data,
+        processData: false,
+        contentType: false,
+        success: function () {
+            location.reload();
+        }
+    });
+};
