@@ -1,4 +1,3 @@
-// drag and drop
 var zone = document.getElementById('dropZone');
 
 if (zone) {
@@ -18,13 +17,20 @@ if (zone) {
         var fichier = e.dataTransfer.files[0];
         if (!fichier) return;
 
-        var input = document.getElementById('mainContent_DocFileUpload');
-        var dt = new DataTransfer();
-        dt.items.add(fichier);
-        input.files = dt.files;
+        var formData = new FormData();
+        formData.append('DocFileUpload', fichier);
+        formData.append('hfFolderTree', document.getElementById('mainContent_hfFolderTree').value);
 
-        document.getElementById('mainContent_tbFileName').value = fichier.name;
-
-        showUploadDlg();
+        $.ajax({
+            type: "POST",
+            url: "QualityFolder.aspx",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                __doPostBack('gotoFolder', document.getElementById('mainContent_hfFolderTree').value);
+            },
+            error: onError
+        });
     }
 }
