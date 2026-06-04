@@ -1,6 +1,2 @@
-if (DBHelper.SQLExecute(strSQL, m_strConnection) == false)
-{
-    fi.Delete();
-    ShowMsgBox("SQL : " + strSQL, "ERROR !", "MsgBox");
-    return;
-}
+insert into BASE_DOCUMENTAIRES(BD_FULL_PATH, BD_NAME, BD_DESCRIPTION, BD_FOLDER_PARENT, BD_CREATE_DATE, BD_CREATE_USER, BD_MODIFY_DATE, BD_MODIFY_USER, BD_TYPE, BD_ORDER) 
+values ('Quality/GEN/REF/test.pdf', 'test', '', 'Quality/GEN/REF', GETDATE(), '0168ENA', NULL, NULL, 3, 0)
