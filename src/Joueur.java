@@ -1,6 +1,6 @@
-// Update BD_NAME seulement
-strSQL = "UPDATE BASE_DOCUMENTAIRES SET BD_NAME = '" + DBHelper.CharToSQL(strName) + "'" +
-    ", BD_DESCRIPTION = '" + DBHelper.CharToSQL(strDescription) + "'" +
-    " WHERE BD_FULL_PATH = '" + lstItem[0].strFullPath + "'";
-
-if (DBHelper.SQLExecute(strSQL, strConnection) == false) return "false";
+if (DBHelper.SQLExecute(strSQL, m_strConnection) == false)
+{
+    fi.Delete();
+    ShowMsgBox("SQL : " + strSQL, "ERROR !", "MsgBox");
+    return;
+}
