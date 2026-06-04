@@ -1,5 +1,6 @@
-{
-    "Message": "Appel de service Web non valide, valeur manquante pour le paramètre : \u0027strData\u0027.",
-    "StackTrace": "   à System.Web.Script.Services.WebServiceMethodData.CallMethod(Object target, IDictionary`2 parameters)\r\n   à System.Web.Script.Services.RestHandler.InvokeMethod(HttpContext context, WebServiceMethodData methodData, IDictionary`2 rawParams)\r\n   à System.Web.Script.Services.RestHandler.ExecuteWebServiceCall(HttpContext context, WebServiceMethodData methodData)",
-    "ExceptionType": "System.InvalidOperationException"
-}
+// Update BD_NAME seulement
+strSQL = "UPDATE BASE_DOCUMENTAIRES SET BD_NAME = '" + DBHelper.CharToSQL(strName) + "'" +
+    ", BD_DESCRIPTION = '" + DBHelper.CharToSQL(strDescription) + "'" +
+    " WHERE BD_FULL_PATH = '" + lstItem[0].strFullPath + "'";
+
+if (DBHelper.SQLExecute(strSQL, strConnection) == false) return "false";
