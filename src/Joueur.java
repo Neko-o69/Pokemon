@@ -53,3 +53,6 @@ function InitDragAndDrop() {
         });
     });
 }
+<div id="dropZone" style="border:2px dashed grey; padding:20px; text-align:center; margin:10px 0; background:#f9f9f9;">
+    Glisser un fichier ici
+</div>
