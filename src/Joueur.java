@@ -1,58 +1,29 @@
-$(document).ready(function () {
-    InitDragAndDrop();
-});
-
-function InitDragAndDrop() {
-    $("#dropZone").on("dragenter dragover", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        $(this).css("background", "#cce");
-    });
-
-    $("#dropZone").on("dragleave", function () {
-        $(this).css("background", "#f9f9f9");
-    });
-
-    $("#dropZone").on("drop", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        $(this).css("background", "#f9f9f9");
-
-        var files = e.originalEvent.dataTransfer.files;
-        if (files.length === 0) return;
-
-        var filesNames = "Upload en cours :<br />";
-        for (var i = 0; i < files.length; i++) {
-            filesNames += files[i].name + "<br />";
-        }
-        $("#dropZone").html(filesNames);
-
-        var data = new FormData();
-        for (var i = 0; i < files.length; i++) {
-            data.append("file" + i, files[i]);
-        }
-
-        var hfFolder = document.getElementById('mainContent_hfFolderTree');
-        data.append('__EVENTTARGET', 'uploadFileDrop');
-        data.append('__EVENTARGUMENT', '');
-        data.append('mainContent_hfFolderTree', hfFolder ? hfFolder.value : 'Quality');
-
-        $.ajax({
-            type: "POST",
-            url: "QualityFolder.aspx",
-            contentType: false,
-            processData: false,
-            data: data,
-            success: function () {
-                $("#dropZone").html("Glisser un fichier ici");
-                __doPostBack('gotoFolder', hfFolder ? hfFolder.value : '');
-            },
-            error: function () {
-                $("#dropZone").html("Erreur upload");
-            }
-        });
-    });
-}
-<div id="dropZone" style="border:2px dashed grey; padding:20px; text-align:center; margin:10px 0; background:#f9f9f9;">
-    Glisser un fichier ici
-</div>
+<tr>
+    <td></td>
+    <td>
+        <div style="min-width: 1024px;">
+            <table id="tableHeader" style="border-spacing: 0; border-collapse: collapse;">
+                <tr>
+                    <td>
+                        <asp:TextBox ID="tbMasterSearch" CssClass="tbSearch" Style="margin-left: 9px;"
+                            runat="server" placeholder="Recherche.." AutoPostBack="false" onkeydown="return onSearchKeyDown(event);"></asp:TextBox>
+                    </td>
+                    <td>
+                        <h1 style="margin-left: 5px; margin-right: 5px;">Base documentaire NIDEK</h1>
+                    </td>
+                    <td>
+                        <ul class="ulMenuHeaderBlue">
+                            <li><a href="javascript:onHome();">Accueil</a></li>
+                            <li><a href="QualityLogin.aspx">Se déconnecter</a></li>
+                            <%--<li><a href="javascript:onChangePassword();">Changer de mot de passe</a></li>--%>
+                        </ul>
+                    </td>
+                    <td>
+                        <asp:Label ID="lbUserName" runat="server" Text="Utilisateur" CssClass="labelMenuHeaderBlue"></asp:Label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </td>
+</tr>
+<tr>
