@@ -78,8 +78,7 @@
                 window.location.href = "QualityFolder.aspx?folder=" + strFullPath + "";
             }
             else {
-                window.location.href = "QualityFolder.aspx?folder=" + strParentFolder + "&file=" + strFullPath;
-                //Quality/VEN/MKT/DOC/MKT-DOC-515- V01 - 30-08-2021 - Guide d&quoteutilisation simplifié Personnalisation Utilisation GYC-YLC-500 VIXI.pdf#saveInfoDlg
+                        window.open("/Images/" + encodeURI(strFullPath), '_blank');
                 }
         }
         
