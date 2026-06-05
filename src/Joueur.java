@@ -1,136 +1,83 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/Quality.master" AutoEventWireup="true" CodeFile="QualityQuery.aspx.cs" Inherits="QualityQuery" %>
+public static string sendRequestModification(string strTo, string strObject, string strBody, string strAttach)
+{
+    String strUser, strPW, strServer, strAuthenfification, strXmlFile, strAttachFile, strEMail;
+    XmlDocument xmlFile = new XmlDocument();
+    XmlNodeList xlmItems;
 
-<asp:Content ID="header" ContentPlaceHolderID="headContent" Runat="Server">
+    if (HttpContext.Current.Session["User"] == null) return "ERROR ! User not login !";
+    NKUser nkUser = (NKUser)HttpContext.Current.Session["User"];
+    strXmlFile = HttpContext.Current.Server.MapPath("App_Data") + "\\Users\\" + nkUser.m_strCode + "\\SmtpServer.xml";
+    if (NKTools.IsFileExist(strXmlFile) == false) return "ERROR ! Configuration file for email not found ";
+    xmlFile.Load(strXmlFile);
 
-    <script src="Scripts/utility.js" ></script>
-    <script src="Scripts/Quality.js" ></script>
-    <script type="text/javascript">
+    xlmItems = xmlFile.GetElementsByTagName("Authentification");
+    strAuthenfification = xlmItems[0].InnerText.ToString().ToUpper();
 
-        function pageLoad() {
-            //var tbMasterSearch = document.getElementById('tbMasterSearch');
-            //if (tbMasterSearch) {
-            //    var fct = "onSearchKeyDown(event);";
-            //    tbMasterSearch.onkeydown = new Function(fct);                
-            //}
+    xlmItems = xmlFile.GetElementsByTagName("User");
+    strUser = xlmItems[0].InnerText.ToString();
 
-            var gvResult = document.getElementById('mainContent_gvResult');
-            if (gvResult) gvResult.focus();
-        }
+    xlmItems = xmlFile.GetElementsByTagName("MW");
+    strPW = xlmItems[0].InnerText.ToString();
 
-
-        window.onscroll = function (event) {
-            var docHeight = document.body.offsetHeight;
-            docHeight = docHeight == undefined ? window.document.documentElement.scrollHeight : docHeight;
-
-            var winheight = window.innerHeight;
-            winheight = winheight == undefined ? document.documentElement.clientHeight : winheight;
-
-            var scrollpoint = window.scrollY;
-            scrollpoint = scrollpoint == undefined ? window.document.documentElement.scrollTop : scrollpoint;
-
-            if ((scrollpoint + winheight) >= docHeight) {
-                //alert("you're at the bottom");
-                var hf = document.getElementById('<%=hfPageIndex.ClientID%>');
-                var hfTotal = document.getElementById('<%=hfTotalPage.ClientID%>');
-                var nPageIndex = parseInt(hf.value);
-                var nTotalPage = parseInt(hfTotal.value);
-                if (nPageIndex < nTotalPage) {
-                    var nNewPageIndex = nPageIndex + 1;
-                    hf.value = nNewPageIndex.toString();
-                    requestData(nPageIndex);
-                }
-            }
-        }
-
-        function requestData(pageIndex) {
-            // populate data from database
-            $.ajax({
-                url: "QualityQuery.aspx/PopulateDataByJava",
-                data: "{pageNo: " + pageIndex + ", noOfRecord: 50}",
-                type: "POST",
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: OnRequestDataSuccess,
-                error: onError
-            });
-        }
+    xlmItems = xmlFile.GetElementsByTagName("SMTP");
+    strServer = xlmItems[0].InnerText.ToString();
 
 
-        function OnRequestDataSuccess(data) {
-            if (data.d == null) return;
-            var gridView = document.getElementById('<%=gvResult.ClientID%>');
-            if (gridView == null) return;
-            var row = null;
-            var d = data.d;
-            for (var i = 0; i < d.length; i++) {
-                //row = gridView.rows[2].cloneNode(true);
-                row = gridView.insertRow(-1);
-                var td = row.insertCell(0);
-                var nType = parseInt(d[i].strType, 0);
-                var div = createQueryDiv(d[i].strName, d[i].strDescription, nType, d[i].strFullPath);
-                td.appendChild(div);
-            }
-        }
+    // Reformatter...
+    String strText = strBody.Replace('|', '\'');
 
 
-        function onItemClicked(nType, strFullPath) {
-            if (nType <= 0) {
-                window.location.href = "QualityFolder.aspx?folder=" + strFullPath + "";
-            }
-            else {
-                        window.open("/Images/" + encodeURI(strFullPath), '_blank');
-                }
-        }
-        
+    ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2010_SP1);
+    service.Credentials = new WebCredentials(strUser, strPW);
+    service.Url = new Uri( "https://mail.nidek.fr/EWS/Exchange.asmx" );
+    service.Url = new Uri(strServer);
+    EmailMessage message = new EmailMessage(service);
+    message.Subject = strObject;
+    //message.Body = MessageTextBox.Text;
+    message.Body = strText.Replace("\r\n", "<br/>");
 
-    </script>
+    //|*******************************************************************
+    //|-- Multi destiny
+    int nOffset = 0;
+    int nIndex = strTo.IndexOf(';');
+    while (nIndex > 0)
+    {
+        strEMail = strTo.Substring(nOffset, nIndex - nOffset).Trim();
+        if (String.IsNullOrEmpty(strEMail) == false)
+            message.ToRecipients.Add(strEMail);
 
-</asp:Content>
+        nOffset += (nIndex - nOffset) + 1;
+        nIndex = strTo.IndexOf(';', nOffset);
+    }
+    // Last item;
+    strEMail = strTo.Substring(nOffset).Trim();
+    if (String.IsNullOrEmpty(strEMail) == false)
+        message.ToRecipients.Add(strEMail);
+    //|*******************************************************************
 
-<asp:Content ID="menu" ContentPlaceHolderID="menuContent" Runat="Server">
-</asp:Content>
+    // Cc tjs à audrey
+    String strCC = ConfigurationManager.AppSettings["QualityManager"];
+    if (String.IsNullOrEmpty(strCC) == false)
+    {
+        message.CcRecipients.Add(strCC);
+    }
 
-<asp:Content ID="main" ContentPlaceHolderID="mainContent" Runat="Server">
-    <div class="divLine"></div>
-    <h2>Résultat de la recherche :</h2>
+    // Attachment
+    strAttachFile = HttpContext.Current.Server.MapPath("Images\\") + strAttach;
+    strAttachFile = strAttachFile.Replace("/", "\\");
+    if (NKTools.IsFileExist(strAttachFile) == false)
+        return "ERROR ! Attach file not exist";
 
-    <asp:HiddenField runat="server" id="hfPageIndex"/>
-    <asp:HiddenField runat="server" id="hfTotalPage"/>
+    message.Attachments.AddFileAttachment(strAttachFile);
+    try
+    {
+        message.Save();
+        message.SendAndSaveCopy();
+    }
+    catch (Exception ex)
+    {
+        return "ERROR : " + ex.ToString();
+    }
 
-    <asp:UpdatePanel ID="upResult" runat="server" UpdateMode="Conditional" ChildrenAsTriggers="true">
-        <Triggers>
-            <asp:AsyncPostBackTrigger ControlID="gvResult" EventName="" />
-        </Triggers>
-        <ContentTemplate>
-            <asp:GridView ID="gvResult" runat="server" AutoGenerateColumns="false" GridLines="None" EnableViewState="true" OnRowDataBound="gvResult_RowDataBound">
-                <Columns>
-                    <asp:TemplateField>
-                        <ItemStyle Width="980px" />
-                        <ItemTemplate>
-                            <div class="lbSearchQualityItem" onclick="onItemClicked(<%# Eval("BD_TYPE") %>, '<%# Eval("BD_FULL_PATH") %>')">
-                                <table class="tableQualityItem">
-                                    <tr>
-                                        <td class="tdQualityImageItem">
-                                            <asp:Image ID="imgFileType" runat="server" ImageUrl="~/Images/icon_folder_documents.png" Width="32px" Height="32px" />
-                                            
-                                        </td>
-                                        <td class="tdQualityTextItem">
-                                            Nom : <%# Eval("BD_NAME") %><br />
-                                            Description : <%# Eval("BD_DESCRIPTION") %>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </ItemTemplate>
-                    </asp:TemplateField>                    
-                </Columns>
-            </asp:GridView>
-        </ContentTemplate>
-    </asp:UpdatePanel>
-
-
-
-    <script src="/Scripts/jquery-2.1.4.min.js"></script>
-
-</asp:Content>
-
+    return "true";
+}
