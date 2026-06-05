@@ -1,94 +1,83 @@
-<%@ Page Title="" Language="C#" MasterPageFile="~/Quality.master" AutoEventWireup="true" CodeFile="QualityProcess.aspx.cs" Inherits="QualityProcess" %>
+[WebMethod(EnableSession = true)]
+public static string sendRequestModification(string strTo, string strObject, string strBody, string strAttach)
+{
+    String strUser, strPW, strServer, strAuthenfification, strXmlFile, strAttachFile, strEMail;
+    XmlDocument xmlFile = new XmlDocument();
+    XmlNodeList xlmItems;
 
-<asp:Content ID="head" ContentPlaceHolderID="headContent" runat="Server">
-</asp:Content>
-<asp:Content ID="menu" ContentPlaceHolderID="menuContent" runat="Server">
-</asp:Content>
-<asp:Content ID="main" ContentPlaceHolderID="mainContent" runat="Server">
+    if (HttpContext.Current.Session["User"] == null) return "ERROR ! User not login !";
+    NKUser nkUser = (NKUser)HttpContext.Current.Session["User"];
+    strXmlFile = HttpContext.Current.Server.MapPath("App_Data") + "\\Users\\" + nkUser.m_strCode + "\\SmtpServer.xml";
+    if (NKTools.IsFileExist(strXmlFile) == false) return "ERROR ! Configuration file for email not found ";
+    xmlFile.Load(strXmlFile);
 
-    <script src="Scripts/utility.js"></script>
-    <script src="Scripts/Quality.js"></script>
-    <script type="text/javascript">
+    xlmItems = xmlFile.GetElementsByTagName("Authentification");
+    strAuthenfification = xlmItems[0].InnerText.ToString().ToUpper();
 
-        function onItemClicked(strSubFolder) {
-            var hf = document.getElementById('mainContent_hfProcess');
-            if (hf == null) return true;
-            var strFullPath = 'Quality/' + hf.value + '/' + strSubFolder;
-            window.location.href = 'QualityFolder.aspx?folder=' + strFullPath;
-            return false;
-        }
+    xlmItems = xmlFile.GetElementsByTagName("User");
+    strUser = xlmItems[0].InnerText.ToString();
 
-    </script>
+    xlmItems = xmlFile.GetElementsByTagName("MW");
+    strPW = xlmItems[0].InnerText.ToString();
 
-    <asp:HiddenField ID="hfProcess" Value="AUT" runat="server" />
-
-    <%--Title --%>
-    <asp:Label ID="lbTitle" runat="server" CssClass="labelTitle" Text="Processus ???" Style="margin-left: 10px;"></asp:Label>
-    <div class="divLine"></div>
-
-    <table style="margin-top: 10px; margin-left: 250px; border-spacing: 0; border-collapse: collapse;">
-        <tr>
-            <td style="text-align: center;">
-                <a href="#">
-                    <asp:LinkButton ID="btnRef" runat="server" CssClass="divQualityPyramid" Style="background-image: url('../Images/icon_pyramid_1.png'); padding-top: 20px;"
-                        OnClientClick="return onItemClicked('REF');"
-                        Width="128px" Height="65px">
-                        Document de<br />référence-<br />REF</asp:LinkButton>
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <td style="text-align: center;">
-                <asp:LinkButton ID="btnProc" runat="server" CssClass="divQualityPyramid" Style="background-image: url('../Images/icon_pyramid_2.png'); padding-top: 20px;"
-                    OnClientClick="return onItemClicked('PROC');" Width="244px" Height="65px">
-                    Procédure - <br />PROC</asp:LinkButton>
-            </td>
-        </tr>
-        <tr>
-            <td style="text-align: center;">
-                <asp:LinkButton ID="btnMOP" runat="server" CssClass="divQualityPyramid" Style="background-image: url('../Images/icon_pyramid_3.png'); padding-top: 30px;"
-                    OnClientClick="return onItemClicked('MOP');" Width="364px" Height="55px">
-                    Mode opératoire - MOP</asp:LinkButton>
-
-            </td>
-        </tr>
-        <tr>
-            <td style="text-align: center;">
-                <asp:LinkButton ID="btnFORM" runat="server" CssClass="divQualityPyramid" Style="background-image: url('../Images/icon_pyramid_4.png'); padding-top: 30px;"
-                    OnClientClick="return onItemClicked('FORM');" Width="484px" Height="55px">
-                    Formulaires - FORM</asp:LinkButton>
-            </td>
-        </tr>
-        <tr>
-            <td style="text-align: center;">
-                <asp:LinkButton ID="btnDOC" runat="server" CssClass="divQualityPyramid" Style="background-image: url('../Images/icon_pyramid_5.png'); padding-top: 30px;"
-                    OnClientClick="return onItemClicked('DOC');" Width="604px" Height="160px">
-                    Documents - DOC</asp:LinkButton>
-            </td>
-            <td style="text-align:center;">
-                <%if (Request.QueryString["Type"] == "DRH")
-                    { %>
-                <asp:LinkButton ID="BtnACC" runat="server" CssClass="divQualityPyramid" Style="background-image: url('../Images/icon_pyramid_rond.png'); padding-top: 80px; text-align:center;  background-repeat: no-repeat; line-height:18px; background-size:200px 200px;"
-                    OnClientClick="return onItemClicked('ACC');" Width="200px" Height="160px">
-                    Accords d'entreprise<br />
-                    Chartes
-                </asp:LinkButton>
-                <% }  %>
-            </td>
-        </tr>
-
-        <%--<tr>
-            <td style="text-align:center;">
-                <asp:LinkButton ID="LinkButton1" runat="server" CssClass="divQualityPyramid" style="background-image:url('../Images/icon_pyramid_rond2.png');padding-top:30px;background-size:contain;"
-                    OnClientClick="return onItemClicked('DOC');" Width="120px" Height="55px">
-                    Documents - DOC</asp:LinkButton>
-            </td>
-        </tr>--%>
-    </table>
+    xlmItems = xmlFile.GetElementsByTagName("SMTP");
+    strServer = xlmItems[0].InnerText.ToString();
 
 
+    // Reformatter...
+    String strText = strBody.Replace('|', '\'');
 
 
+    ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2010_SP1);
+    service.Credentials = new WebCredentials(strUser, strPW, "NIDEK");
+    service.Url = new Uri( "https://mail.nidek.fr/EWS/Exchange.asmx" );
+    service.Url = new Uri(strServer);
+    EmailMessage message = new EmailMessage(service);
+    message.Subject = strObject;
+    //message.Body = MessageTextBox.Text;
+    message.Body = strText.Replace("\r\n", "<br/>");
 
-</asp:Content>
+    //|*******************************************************************
+    //|-- Multi destiny
+    int nOffset = 0;
+    int nIndex = strTo.IndexOf(';');
+    while (nIndex > 0)
+    {
+        strEMail = strTo.Substring(nOffset, nIndex - nOffset).Trim();
+        if (String.IsNullOrEmpty(strEMail) == false)
+            message.ToRecipients.Add(strEMail);
 
+        nOffset += (nIndex - nOffset) + 1;
+        nIndex = strTo.IndexOf(';', nOffset);
+    }
+    // Last item;
+    strEMail = strTo.Substring(nOffset).Trim();
+    if (String.IsNullOrEmpty(strEMail) == false)
+        message.ToRecipients.Add(strEMail);
+    //|*******************************************************************
+
+    // Cc tjs à audrey
+    String strCC = ConfigurationManager.AppSettings["QualityManager"];
+    if (String.IsNullOrEmpty(strCC) == false)
+    {
+        message.CcRecipients.Add(strCC);
+    }
+
+    // Attachment
+    strAttachFile = HttpContext.Current.Server.MapPath("Images\\") + strAttach;
+    strAttachFile = strAttachFile.Replace("/", "\\");
+    if (NKTools.IsFileExist(strAttachFile) == false)
+        return "ERROR ! Attach file not exist";
+
+    message.Attachments.AddFileAttachment(strAttachFile);
+    try
+    {
+        message.Send();
+    }
+    catch (Exception ex)
+    {
+        return "ERROR : " + ex.ToString();
+    }
+
+    return "true";
+}
