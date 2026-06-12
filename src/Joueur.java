@@ -1,145 +1,110 @@
-protected void UploadFile()
-{
+function pageLoad() {
 
-    NKUser nkUser = (NKUser)Session["User"];
-    if (nkUser.HasRight(NKUser.USER_RIGHT_UPLOAD) == false)
-    {
-        ShowMsgBox("Vous n'avez pas le droit pour cette opération", "ERREUR !", "MsgBox");
-        return;
-    }
-    if (DocFileUpload.HasFile == false) return;
+    //showDragInfo();
 
-    // Save this file to temps folder
-    String strDate = DBHelper.GetCurrentDate();
-    String strParentFolder = hfFolderTree.Value;
-    if (String.IsNullOrEmpty(strParentFolder))
-        strParentFolder = "Quality";
-    String strFullPath = strParentFolder + "/" + DocFileUpload.FileName.Replace("'", "&quote");
-    String strFileName = Server.MapPath("Images/") + strFullPath;
 
-    int nIndex = DocFileUpload.FileName.LastIndexOf('.');
-    if (nIndex < 0) return;
-    String strExt = DocFileUpload.FileName.Substring(nIndex + 1).ToUpper();
-    String strDisplay = tbDisplay.Text;
-    if (strDisplay == "")
-        strDisplay = DocFileUpload.FileName.Substring(0, nIndex);
-    String strDescription = tbDescription.Text;
+    isIE = isIEBrowser();
+    isEDGE = isEDGEBowser();
 
-    switch (strExt)
-    {
-        case "DOC":
-        case "DOCX":
-            nIndex = 1;
-            break;
+    //|------------------------------------------------------
+    //|------------------------------------------------------
+    populateAborescence();
 
-        case "XLS":
-        case "XLSX":
-            nIndex = 2;
-            break;
+    //|------------------------------------------------------
+    // Modify l'item btnDelete
+    //|------------------------------------------------------
+    var btn = document.getElementById('btnFolder');
+    if (btn) {
+        var hfCurrentFolder = document.getElementById('<%= hfCurrentFolder.ClientID %>');
+        if (hfCurrentFolder.value == 'Quality' || hfCurrentFolder.value == '') {
+            btn.text = 'Supprimer le dossier';
+            btn.style.display = 'none';
+            
 
-        case "PDF":
-            nIndex = 3;
-            break;
-
-        case "PNG":
-        case "JPG":
-        case "JPEG":
-        case "GIF":
-        case "BMP":
-            nIndex = 4;
-            break;
-
-        case "PPT":
-        case "PPTX":
-            nIndex = 5;
-            break;
-
-        case "ZIP":
-        case "RAR":
-            nIndex = 6;
-            break;
-
-        case "MPP":
-            nIndex = 7;
-            break;
-
-        case "XML":
-            nIndex = 8;
-            break;
-        case "BIN":
-            nIndex = 9;
-            break;
-        case "DWG":
-            nIndex = 10;
-            break;
-
-        default:
-            ShowMsgBox("Le type de fichier [" + strExt + "] n'est pas connu !\r\nLes fichiers valables sont Word, Pdf, Excel, Images, Zip.", "ERREUR !", "MsgBox");
-            return;
-
-    }
-
-    try
-    {
-        FileInfo fi = new FileInfo(strFileName);
-        if (fi.Exists)
-        {
-            fi.Delete();
+           
+           
         }
-        DocFileUpload.SaveAs(strFileName);
-
-        // Save ok, insert into database
-        String strParent = strParentFolder;
-        //if (strParent == "Quality") strParent = ""; // Suis à la racine !
-        int nOrder = 0;
-        DataTable dt;
-        if (strParent == "")
-            dt = DBHelper.SQLOpen("select BD_ORDER from BASE_DOCUMENTAIRES " +
-                "where BD_FOLDER_PARENT is NULL or BD_FOLDER_PARENT = '' or BD_FOLDER_PARENT = 'Quality' order by BD_ORDER desc", m_strConnection);
-        else
-            dt = DBHelper.SQLOpen("select BD_ORDER from BASE_DOCUMENTAIRES where BD_FOLDER_PARENT = '" + strParent + "' order by BD_ORDER desc", m_strConnection);
-
-        if (dt.Rows.Count > 0)
-            nOrder = DBHelper.GetInt(0, "BD_ORDER", dt) + 1;
-
-        String strSQL = "insert into BASE_DOCUMENTAIRES" +
-            "(BD_FULL_PATH, BD_NAME, BD_DESCRIPTION, BD_FOLDER_PARENT, BD_CREATE_DATE, BD_CREATE_USER, BD_MODIFY_DATE, BD_MODIFY_USER, BD_TYPE, BD_ORDER) values (" +
-            "'" + DBHelper.CharToSQL(strFullPath) + "', '" + DBHelper.CharToSQL(strDisplay) + "', '" + DBHelper.CharToSQL(strDescription) + "', '" + strParent + "', " +
-            strDate + ", '" + nkUser.m_strCode + "', NULL, NULL, " + nIndex.ToString() + ", " + nOrder.ToString() + ")";
-        if (DBHelper.SQLExecute(strSQL, m_strConnection) == false)
-        {
-            fi.Delete();
-            ShowMsgBox("System error please contact admin for more details !", "ERROR !", "MsgBox");
-            //ShowMsgBox(strSQL, "ERROR !", "MsgBox");
-            return;
+        else {
+            btn.text = 'Supprimer le dossier : [' + hfCurrentFolder.value + ']';
+            btn.style.display = 'block';
         }
-        //DataTable dtEmail = DBHelper.SQLOpen("select BD_EMAIL from BD_EMAIL where BD_FULL_PATH = '" + strParentFolder + "'", m_strConnection);
-        //string strTo = "";
-        //if (dtEmail.Rows.Count > 0)
-        //    strTo = dtEmail.Rows[0]["BD_EMAIL"].ToString();
-        //if (String.IsNullOrEmpty(strTo)) strTo = "othmaneqlq@gmail.com"; // email par défaut
-        //string strObject = "Nouveau document ajouté";
-        //string strBody = "Un nouveau document a été ajouté : " + strDisplay + "par : " + nkUser.m_strCode;
-        //string result = sendRequestModification(strTo, strObject, strBody, strFullPath);
-
-
-
-
-        // Reload...
-        gotoFolder(strParentFolder);
-        //if(dlFolder.Items.Count <= 0)
-        //{
-        //    hfAddNewFile.Value = "";
-        //    gotoFolder(strParentFolder);
-        //}
-        //else
-        //    hfAddNewFile.Value = strDisplay + "/" + nIndex.ToString() + "/" + strFullPath;
-        //Response.Redirect("QualityFolder.aspx?folder=" + strParentFolder);
-        m_strPostBackCtrl = null;
+   
+       
     }
-    catch (Exception ex)
-    {
-        ShowMsgBox(ex.Message, "ERREUR SYSTEME !", "MsgBox");
-    }
+
     
+ 
+    //|------------------------------------------------------
+    // Init Image viewer
+    //|------------------------------------------------------
+    osdViewer = OpenSeadragon({
+        id: "divImageViewer",
+        //prefixUrl: "/images/",
+        //tileSources: "/path/to/my/image.dzi"
+        tileSources: {
+            type: 'image',
+            url: '/Images/no_big_image.png'
+        }
+    });
+
+    //|------------------------------------------------------
+    // Check if add new file
+    //|------------------------------------------------------
+    var hfAddNewFile = document.getElementById('mainContent_hfAddNewFile');
+    if (hfAddNewFile && hfAddNewFile.value != "") {
+        // Décomposer 
+        var strName = "", strFullPath = "";
+        var nType = 1;
+        var nIndex = hfAddNewFile.value.indexOf('/');
+        if (nIndex > 0) {
+            strName = hfAddNewFile.value.substring(0, nIndex);
+            var strType = hfAddNewFile.value.substring(nIndex + 1, nIndex + 2);
+            nType = parseInt(strType);
+            strFullPath = hfAddNewFile.value.substring(nIndex + 3);
+        }
+
+        var dataList = document.getElementById('mainContent_dlFolder');
+        //var dataList = document.getElementById('mainContent_gvFolder');
+        if (dataList == null) return;
+
+        var row = dataList.insertRow(dataList.rows.length);
+        var td = row.insertCell(0);
+
+        var div = createDiv(strName, nType, strFullPath);
+        td.appendChild(div);
+
+        hfAddNewFile.value = "";
+    }
+
+    // Check user right
+    requestUserRight();
+
+
+    // select file ?
+    // this vient généralement de la page QualityQuery
+    var hfSelectedFile = document.getElementById('mainContent_hfSelectedFile');
+    if (hfSelectedFile == null) return;
+    if (hfSelectedFile.value.length <= 0) return;
+    var hfSelectedType = document.getElementById('mainContent_hfSelectedType');
+    if (hfSelectedType == null) return;
+    if (hfSelectedType.value.length <= 0) return;
+
+    hfSelectedRow = document.getElementById('mainContent_hfSelectedRow');
+    if (hfSelectedRow == null) return;
+    if (hfSelectedRow.value.length <= 0) return;
+
+    var dataList = document.getElementById('mainContent_dlFolder');
+    if (dataList == null) return;
+    var nRow = parseInt(hfSelectedRow.value);
+    if (nRow >= 0) {
+        var div = dataList.rows[nRow].children[0].children[0];
+        // Scroll first to d'abord
+        dataList.scrollTop = div.clientHeight * nRow;
+        var nType = parseInt(hfSelectedType.value);
+        if (nType > 0) {
+            onItemClicked(div, nType, hfSelectedFile.value);
+        }
+    }
+
+
 }
