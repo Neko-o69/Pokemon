@@ -1,23 +1,27 @@
-protected void gotoFolder(String strFullPath)
-{
-    String strSQL = "";
+function InitDragAndDrop() {
 
-    if (strFullPath == "")
-        strSQL = "select * from BASE_DOCUMENTAIRES where BD_FOLDER_PARENT is NULL or BD_FOLDER_PARENT = '' or BD_FOLDER_PARENT = 'Quality' order by BD_TYPE, BD_ORDER";
-    else
-        strSQL = "select * from BASE_DOCUMENTAIRES where BD_FOLDER_PARENT = '" + strFullPath + "' order by BD_TYPE, BD_NAME ASC";
+    $("#dropZone").on("dragover", function (e) {
+        e.preventDefault();
+        $(this).css("background", "grey");
+    });
 
-    hfFolderTree.Value = strFullPath;
-    // Extract le dossier courant
-    String strPath = strFullPath;
-    int nIndex = strPath.LastIndexOf('/');
-    if (nIndex >= 0)
-        strPath = strPath.Substring(nIndex + 1);
-    hfCurrentFolder.Value = strPath;
+    $("#dropZone").on("dragleave", function () {
+        $(this).css("background", "white");
+    });
 
-    DataTable dt = DBHelper.SQLOpen(strSQL, m_strConnection);
-    dlFolder.DataSource = dt;
-    dlFolder.DataBind();
-    Session["BASE_DOCUMENTAIRES"] = dt;
+    $("#dropZone").on("drop", function (e) {
+        e.preventDefault();
+        $(this).css("background", "white");
 
-}
+        var Files = e.originalEvent.dataTransfer.files;
+        if (Files.length == 0) return;
+
+        var monInput = document.getElementById('mainContent_DocFileUpload');
+        var transfer = new DataTransfer();
+        transfer.items.add(Files[0]);
+        monInput.files = transfer.files;
+
+        document.getElementById('mainContent_tbFileName').value = Files[0].name;
+
+        checkAndUploadFile();
+    });
