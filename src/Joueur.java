@@ -33,3 +33,6 @@ ClientScript.RegisterStartupScript(
 
 // Reload...
 gotoFolder(strParentFolder);
+
+
+https://learn.microsoft.com/fr-fr/aspnet/web-pages/overview/getting-started/11-adding-email-to-your-web-site
