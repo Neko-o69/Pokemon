@@ -1,27 +1,35 @@
-function InitDragAndDrop() {
+if (DBHelper.SQLExecute(strSQL, m_strConnection) == false)
+{
+    fi.Delete();
+    ShowMsgBox("System error please contact admin for more details !", "ERROR !", "MsgBox");
+    return;
+}
 
-    $("#dropZone").on("dragover", function (e) {
-        e.preventDefault();
-        $(this).css("background", "grey");
-    });
 
-    $("#dropZone").on("dragleave", function () {
-        $(this).css("background", "white");
-    });
+// Ouverture du mail
+string destinataire = "Eric_Nara@nidek.fr";
 
-    $("#dropZone").on("drop", function (e) {
-        e.preventDefault();
-        $(this).css("background", "white");
+string sujet = "Nouveau document ajouté";
 
-        var Files = e.originalEvent.dataTransfer.files;
-        if (Files.length == 0) return;
+string corps = "Un nouveau document a été ajouté."
+             + "\r\n\r\n"
+             + "Dossier : " + strParentFolder
+             + "\r\n"
+             + "Fichier : " + strDisplay
+             + "\r\n"
+             + "Ajouté par : " + nkUser.m_strCode;
 
-        var monInput = document.getElementById('mainContent_DocFileUpload');
-        var transfer = new DataTransfer();
-        transfer.items.add(Files[0]);
-        monInput.files = transfer.files;
+string mailto = "mailto:" + destinataire
+              + "?subject=" + HttpUtility.UrlEncode(sujet)
+              + "&body=" + HttpUtility.UrlEncode(corps);
 
-        document.getElementById('mainContent_tbFileName').value = Files[0].name;
+ClientScript.RegisterStartupScript(
+    GetType(),
+    "openMail",
+    "window.location.href='" + mailto.Replace("'", "\\'") + "';",
+    true
+);
 
-        checkAndUploadFile();
-    });
+
+// Reload...
+gotoFolder(strParentFolder);
