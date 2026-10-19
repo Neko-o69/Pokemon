@@ -1,58 +1,78 @@
-function doDrop(e, strFullPath, nType) {
-    e.preventDefault();
-    e.stopPropagation();
+[WebMethod(EnableSession = true)]
+public static string moveItem(string strSource, string strTarget)
+{
+    if (HttpContext.Current.Session["User"] == null)
+        return "ERROR ! User not login !";
 
-    var strSource = e.dataTransfer.getData("text");
+    try
+    {
+        if (String.IsNullOrEmpty(strSource))
+            return "ERROR : fichier source vide";
 
-    if (strSource == "")
-        return false;
+        if (String.IsNullOrEmpty(strTarget))
+            return "ERROR : dossier destination vide";
 
-    if (nType != 0)
-        return false;
+        String strConnection =
+            ConfigurationManager.ConnectionStrings["OPHELIE"].ConnectionString;
 
-    $.ajax({
-        type: "POST",
-        url: "QualityFolder.aspx/moveItem",
-        data: JSON.stringify({
-            strSource: strSource,
-            strTarget: strFullPath
-        }),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
+        String strFileName =
+            strSource.Substring(strSource.LastIndexOf('/') + 1);
 
-        success: function (response) {
-            if (response.d == "true") {
-                location.reload();
+        String strNewFullPath =
+            strTarget.TrimEnd('/') + "/" + strFileName;
+
+        // Chemin du fichier actuel
+        String strSourcePath =
+            HttpContext.Current.Server.MapPath("~/Images/") +
+            strSource.Replace("/", "\\");
+
+        // Chemin du nouveau fichier
+        String strDestinationPath =
+            HttpContext.Current.Server.MapPath("~/Images/") +
+            strNewFullPath.Replace("/", "\\");
+
+        // Vérifie que le fichier existe
+        if (System.IO.File.Exists(strSourcePath) == false)
+            return "ERROR : fichier introuvable : " + strSourcePath;
+
+        // Vérifie que le dossier destination existe
+        String strDestinationFolder =
+            System.IO.Path.GetDirectoryName(strDestinationPath);
+
+        if (System.IO.Directory.Exists(strDestinationFolder) == false)
+            return "ERROR : dossier destination introuvable";
+
+        // Vérifie qu'un fichier du même nom n'existe pas déjà
+        if (System.IO.File.Exists(strDestinationPath))
+            return "ERROR : le fichier existe déjà dans ce dossier";
+
+        // Déplacement du fichier
+        // File.Move supprime automatiquement le fichier de l'ancien emplacement
+        System.IO.File.Move(strSourcePath, strDestinationPath);
+
+        // Mise à jour de la base
+        String strSQL =
+            "UPDATE BASE_DOCUMENTAIRES SET " +
+            "BD_FULL_PATH = '" + DBHelper.CharToSQL(strNewFullPath) + "', " +
+            "BD_FOLDER_PARENT = '" + DBHelper.CharToSQL(strTarget) + "' " +
+            "WHERE BD_FULL_PATH = '" + DBHelper.CharToSQL(strSource) + "'";
+
+        if (DBHelper.SQLExecute(strSQL, strConnection) == false)
+        {
+            // Si la base ne se met pas à jour,
+            // on remet le fichier à son emplacement d'origine
+            if (System.IO.File.Exists(strDestinationPath))
+            {
+                System.IO.File.Move(strDestinationPath, strSourcePath);
             }
-            else {
-                showMsgBox(response.d, "ATTENTION !", "MsgBox");
-            }
-        },
 
-        error: function (xhr) {
-            showMsgBox("Erreur lors du déplacement du fichier.", "ERREUR !", "MsgBox");
+            return "ERROR : impossible de modifier la base de données";
         }
-    });
 
-    return false;
-}
-function createQueryDiv(strTitle, strDescription, nType, strFullPath) {
-    var div = document.createElement('div');
-
-    div.className = "rbSearchQualityItem";
-
-    // Permet de déplacer le fichier
-    div.draggable = true;
-
-    div.ondragstart = function (e) {
-        e.dataTransfer.setData("text", strFullPath);
-    };
-
-    var fct = "onItemClicked(" + nType + ", '" + strFullPath + "');";
-    div.onclick = new Function(fct);
-
-    var table = createQueryTable(strTitle, strDescription, nType);
-    div.appendChild(table);
-
-    return div;
+        return "true";
+    }
+    catch (Exception ex)
+    {
+        return "ERROR : " + ex.Message;
+    }
 }
